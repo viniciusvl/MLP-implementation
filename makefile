@@ -1,10 +1,10 @@
 all: lisrun
 	
 lisrun:
-	g++ *.cpp -o tsp -O3
+	g++ *.cpp -o mlp -O3
 
 run:
-	start ./tsp
+	start ./mlp
 
 clean:
-	rm ./tsp
+	rm ./mlp

@@ -12,7 +12,4 @@ struct Solution
     void print();
 };
 
-
-
-
 #endif
