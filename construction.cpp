@@ -8,7 +8,7 @@
 #include <cmath>
 
 std::vector<int> initialSubTour(Solution &s);
-std::vector<insertionInfo> calculateCost(Solution &s, std::vector<int> &CL);
+std::vector<insertionInfo> calculateCost(int r, std::vector<int> &CL);
 
 Solution Construction()
 {
@@ -18,11 +18,19 @@ Solution Construction()
     s.route = {1, 1};
 
     // inicia CL  
-    std::vector<int> CL = initialSubTour(s);
+    std::vector<int> CL;
+    for (int i = 2; i <= data.n; i++)
+    {
+        CL.push_back(i);
+    }
 
+    int r = 1;
     while (!CL.empty())
     {
-        std::vector<insertionInfo> costsCandidates =  calculateCost(s, CL);
+        // calculando array de custos
+        std::vector<insertionInfo> costsCandidates =  calculateCost(r, CL);
+
+        // ordenando array 
         std::sort(costsCandidates.begin(), costsCandidates.end(), 
                     [](insertionInfo &a, insertionInfo &b){
                         return a.cost < b.cost;
@@ -32,11 +40,14 @@ Solution Construction()
         double alpha = 0.5;
         int i = rand() % ((int) ceil(alpha * costsCandidates.size()));
 
+        // valor escolhido
+        int r = costsCandidates[i].k;
+
         // insere o valor escolhido
-        s.route.insert(s.route.end() - 1, costsCandidates[i].k);
+        s.route.insert(s.route.end() - 1, r);
 
         // remove o indice escolhido de CL
-        auto itRemove = std::find(CL.begin(), CL.end(), costsCandidates[i].k);
+        auto itRemove = std::find(CL.begin(), CL.end(), r);
         CL.erase(itRemove);
     }
     s.cost = s.calculateCost();
@@ -44,52 +55,19 @@ Solution Construction()
     return s;
 }
 
-// Constroi o subtour inicial
-std::vector<int> initialSubTour(Solution &s)
-{
-    std::vector<int> CL;
-    Data &data = Data::getInstance();
-    
-    // inicializa todos os candidatos
-    for (int i = 2; i <= data.n; i++)
-    {
-        CL.push_back(i);
-    }
-    
-    // quantidade de nós a adicionar em s 
-    int  nodes = 3;    
-    while (nodes--) 
-    {
-        // seleciona indice aleatorio 
-        int index = rand() % CL.size(); 
-
-        // insere na rota
-        s.route.insert(s.route.end() - 1, CL[index]);
-
-        // exclui de CL
-        CL.erase(CL.begin() + index);
-    }
-
-    return CL;
-}
-
 // Calcula todos os custos de inserção
-std::vector<insertionInfo> calculateCost(Solution &s, std::vector<int> &CL)
+std::vector<insertionInfo> calculateCost(int r, std::vector<int> &CL)
 {
     Data &data = Data::getInstance();
     auto &t = data.matrizAdj;
-
     std::vector<insertionInfo> infoCosts(CL.size());
-
-    int sizeRoute = s.route.size();
 
     // Calcula as possibilidades de inserção de CL no último elemento
     int l = 0;
-    int lastRoute = sizeRoute - 2;
     for (auto &node: CL)
     {
         infoCosts[l].k = node;
-        infoCosts[l].cost = t[node][lastRoute]; // calcula custo de 'node' adicionado
+        infoCosts[l].cost = t[r][node]; // calcula custo de 'node' adicionado
         l++;
     }
     
